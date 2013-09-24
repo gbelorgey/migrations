@@ -47,5 +47,9 @@ class YamlConfiguration extends AbstractFileConfiguration
         }
 
         $this->setConfiguration($config);
+
+        if (isset($array['mapping_types']) && is_array($array['mapping_types'])) {
+            $this->setMappingTypes($array['mapping_types']);
+        }
     }
 }

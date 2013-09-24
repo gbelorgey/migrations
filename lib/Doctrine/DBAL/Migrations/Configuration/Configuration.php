@@ -750,6 +750,16 @@ class Configuration
         }
     }
 
+     * Register Doctrine Type Mapping
+     *
+     * @param array $mapping_types Mapping types array
+     */
+    public function setMappingTypes($mapping_types) {
+        foreach($mapping_types as $field=>$type) {
+            $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping($field, $type);
+        }
+    }
+
     /**
      * Check if we should execute a migration for a given direction and target
      * migration version.
