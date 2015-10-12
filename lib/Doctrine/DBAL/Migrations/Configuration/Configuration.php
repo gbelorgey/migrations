@@ -750,6 +750,7 @@ class Configuration
         }
     }
 
+    /**
      * Register Doctrine Type Mapping
      *
      * @param array $mapping_types Mapping types array
