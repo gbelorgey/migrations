@@ -45,11 +45,11 @@ class YamlConfiguration extends AbstractFileConfiguration
         if (isset($config['migrations_directory'])) {
             $config['migrations_directory'] = $this->getDirectoryRelativeToFile($file, $config['migrations_directory']);
         }
-
-        $this->setConfiguration($config);
-
         if (isset($array['mapping_types']) && is_array($array['mapping_types'])) {
             $this->setMappingTypes($array['mapping_types']);
+            unset($array['mapping_types']);
         }
+
+        $this->setConfiguration($config);
     }
 }
