@@ -312,6 +312,10 @@ trait ModuleTrait
     {
         $id = $this->getModuleId($name);
 
+        if (!$id) {
+            return $this;
+        }
+
         $tables = [
             'hook_module_exceptions',
             'module',
