@@ -15,21 +15,21 @@ All available documentation can be found [here](http://docs.doctrine-project.org
 The repository containing the documentation is [there](https://github.com/doctrine/migrations-documentation).
 
 ## Working with Doctrine Migrations
-    
+
 ### Using the integration of your framework
 
   * [Symfony](https://packagist.org/packages/doctrine/doctrine-migrations-bundle)
-  * [ZF2](https://packagist.org/packages/doctrine/doctrine-orm-module) 
+  * [ZF2](https://packagist.org/packages/doctrine/doctrine-orm-module)
   * [laravel](https://packagist.org/packages/laravel-doctrine/migrations)
   * [Silex](https://packagist.org/packages/kurl/silex-doctrine-migrations-provider)
   * [Silex](https://packagist.org/packages/dbtlr/silex-doctrine-migrations)
   * [nette](https://packagist.org/packages/zenify/doctrine-migrations)
   * others...
-        
+
 ### Using composer
-            
+
 ```composer require doctrine/migrations```
-        
+
 ### Downloading the latest phar release
 
 You can download the [doctrine migrations phar](https://github.com/doctrine/migrations/releases) directly on the release page
@@ -107,3 +107,74 @@ php vendor/phpunit/phpunit/phpunit
 This appears to be some bug.
 
 Happy testing :-)
+
+## Prestashop Specific Methods
+
+You can generate a migration with specifics methods for Prestashop by running `./bin/cli migrations:generate --prestashop`
+
+### Methods with Prestashop Migration
+
+All tab's and accesses relative method, except `getTabId` and `getParentTabId`, can chained.
+
+```php
+$this->addTab(1, 'TabClass', 'Tab name')->setTabAfter('TabClass', 'OtherTabClass');
+```
+
+#### Access
+
+* `self` addAccess( `interger` $id_tab )
+* `self` deleteAccess( `interger` $id_tab )
+
+#### Config
+
+* `void` addConfig( `string` $name [ , `string`|`array` $value = null [ , `integer` $id_shop_group = null [ , `integer` $id_shop = null ] ] ] )
+* `void` deleteConfig( `string` $name )
+* `integer` getConfigId( `string` $name )
+* `string` getConfigValue( `string` $name , [ , `integer` $id_shop = null ] )
+* `void` setConfig( `string` $name, `string` $value [ , `integer` $id_shop_group = null [ , `integer` $id_shop = null ] ] )
+* `void` updateConfig( `string` $name, `string` $value [ , `integer` $id_shop_group = null [ , `integer` $id_shop = null ] ] )
+* `void` updateConfigLang( `string` $name, `string` $value , `string` $iso [ , `integer` $id_shop_group = null [ , `integer` $id_shop = null ] ] )
+
+#### DbTools
+
+* `self` alterTable( `string` $table, `array` $rules )
+* `self` dropTable( `string` $table )
+* `self` updateTable( `string` $controller, `array` $rules [ , `array` $conditions = array() ] )
+
+#### ImageFormat
+
+* `self` addImageFormat( `string` $family, [ , `array` $formats = array() [ , `integer` $id_shop_group = false ] ] )
+* `self` deleteImageFormat( `string` $family, [ , `string` $pattern = false [ , `integer` $id_shop_group = false ] ] )
+
+#### Meta
+
+* `void` addMeta( `string` $name [ , `array` $langs = array() ] )
+* `void` deleteMeta( `string` $name )
+
+#### Module
+
+* `self` activateModule( `string` $name)
+* `self` addModule( `string` $name, `string` $version [ , `bool` $active = true [ , `array` $access = array() ] ] )
+* `self` addModuleAccess ( `interger` $id_module [ , `array` $access = array() ] )
+* `self` deactivateModule( `string` $name)
+* `self` deleteModule( `string` $name)
+* `self` deleteModuleAccess ( `interger` $id_module )
+* `integer` getModuleId( `string` $name)
+
+#### Tab
+
+* `self` addTab( `interger` $id_tab_parent, `string` $controller, `string` $name )
+* `self` changeParent( `string` $controller, `interger` $id_tab_parent )
+* `self` deleteTab( `string` $controller )
+* `integer` getTabId( `string` $controller )
+* `integer` getParentTabId( `string` $controller )
+* `self` setTabAfter( `string` $controller, `string` $target )
+* `self` setTabBefore( `string` $controller, `string` $target )
+* `self` reorderTabs( `interger` $id_tab_parent )
+
+`deleteTab`, `setTabAfter` and `setTabBefore` automaticaly trigger `reorderTabs` method.
+
+#### Shop
+
+* `array` getAllShops( `bool` $active)
+* `array` getShopById( `interger` $id_shop)

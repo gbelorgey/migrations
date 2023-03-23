@@ -19,8 +19,8 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class GenerateCommand extends AbstractCommand
 {
-    private static $_template =
-            '<?php declare(strict_types=1);
+    protected static $_template = [
+        'default' => '<?php declare(strict_types=1);
 
 namespace <namespace>;
 
@@ -44,9 +44,34 @@ final class Version<version> extends AbstractMigration
 <down>
     }
 }
-';
+',
+        'prestashop' => '<?php declare(strict_types=1);
 
-    private $instanceTemplate;
+namespace <namespace>;
+
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigrationPrestashop;
+
+/**
+* Auto-generated Migration: Please modify to your needs!
+*/
+final class Version<version> extends AbstractMigrationPrestashop
+{
+    public function up(Schema $schema) : void
+    {
+        // this up() migration is auto-generated, please modify it to your needs
+    <up>
+    }
+
+    public function down(Schema $schema) : void
+    {
+        // this down() migration is auto-generated, please modify it to your needs
+    <down>
+    }
+}'
+    ];
+
+    protected $instanceTemplate = [];
 
     protected function configure()
     {
@@ -54,6 +79,8 @@ final class Version<version> extends AbstractMigration
                 ->setName('migrations:generate')
                 ->setDescription('Generate a blank migration class.')
                 ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
+                ->addOption('prestashop', 'p', InputOption::VALUE_NONE, 'Generate a blank migration class specific for Prestashop')
+                ->addOption('use-tabs', null, InputOption::VALUE_NONE, 'Use tabs instead of space for indentation')
                 ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
@@ -80,13 +107,13 @@ EOT
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
 
-    protected function getTemplate()
+    private function getTemplate($type)
     {
-        if ($this->instanceTemplate === null) {
-            $this->instanceTemplate = self::$_template;
+        if (!isset($this->instanceTemplate[$type]) || is_null($this->instanceTemplate[$type])) {
+            $this->instanceTemplate[$type] = static::$_template[$type];
         }
 
-        return $this->instanceTemplate;
+        return $this->instanceTemplate[$type];
     }
 
     protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
@@ -104,7 +131,14 @@ EOT
             $down ? "        " . implode("\n        ", explode("\n", $down)) : null,
         ];
 
-        $code = str_replace($placeHolders, $replacements, $this->getTemplate());
+        $template_prestashop = $input->getOption('prestashop');
+        $type = 'default';
+        if ($template_prestashop) {
+            $type = 'prestashop';
+        }
+        $template = $this->getTemplate($type);
+
+        $code = str_replace($placeHolders, $replacements, $template);
         $code = preg_replace('/^ +$/m', '', $code);
 
         $directoryHelper = new MigrationDirectoryHelper($configuration);
@@ -141,6 +175,6 @@ EOT
         }
 
         $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $customTemplate));
-        $this->instanceTemplate = $content;
+        $this->instanceTemplate['default'] = $content;
     }
 }
