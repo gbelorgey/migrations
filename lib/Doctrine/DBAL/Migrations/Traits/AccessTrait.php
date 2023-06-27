@@ -36,7 +36,7 @@ trait AccessTrait
                 $slug = $slug_prefix . $right;
 
                 $this->connection->executeQuery(
-                    'INSERT INTO `' . _DB_PREFIX_ . 'authorization_role`
+                    'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'authorization_role`
                     (
                         `slug`
                     )
@@ -46,9 +46,16 @@ trait AccessTrait
                 );
 
                 $id_authorization_role = intval($this->connection->lastInsertId());
+                if (!$id_authorization_role) {
+                    $id_authorization_role = $this->connection->fetchColumn('
+                        SELECT `id_authorization_role`
+                        FROM `' . _DB_PREFIX_ . 'authorization_role`
+                        WHERE `slug` = "' . $slug . '"
+                    ');
+                }
 
                 $this->addSql(
-                    'INSERT INTO `' . _DB_PREFIX_ . 'access`
+                    'INSERT IGNORE INTO `' . _DB_PREFIX_ . 'access`
                     (
                         `id_profile`,
                         `id_authorization_role`
